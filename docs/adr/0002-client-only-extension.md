@@ -22,7 +22,8 @@ the JSON successor of WHOIS.
 We will ship a Manifest V3 extension with no backend. The service worker
 passively records `main_frame` response headers; the popup queries
 Cloudflare DoH (`cloudflare-dns.com`) and `rdap.org` only when the user opens
-it. One build targets both Chrome and Firefox 121 or later.
+it. One build targets Chromium browsers, Firefox 140 or later and Firefox
+for Android 142 or later.
 
 ## Options considered
 

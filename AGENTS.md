@@ -1,8 +1,9 @@
 # spectral
 
-Browser extension (Manifest V3, Chrome and Firefox) that shows the
-infrastructure behind the site in the active tab: CDN, hosting, network owner,
-DNS provider, email providers and domain-verified SaaS. It runs entirely
+Browser extension (Manifest V3; Chromium browsers, Firefox, Firefox for
+Android) that shows the infrastructure behind the site in the active tab:
+CDN, hosting, network owner, DNS provider, email providers and
+domain-verified SaaS. It runs entirely
 client-side; there is no backend. See [ADR 0002](docs/adr/0002-client-only-extension.md).
 
 This file is the single source of truth for agent instructions, as prescribed
@@ -14,6 +15,9 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 - Validate: `npm run check` (typecheck and unit tests; always run after editing).
 - Build: `npm run build` writes the unpacked extension to `dist/`.
 - Watch: `npm run dev` rebuilds `dist/` on change; reload the extension in the browser.
+- Firefox: `npm run firefox:lint` validates `dist/` for AMO (after a build);
+  `npm run firefox:run` and `npm run firefox:android -- --android-device=<id>`
+  launch it.
 
 ## Architecture
 

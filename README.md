@@ -32,10 +32,22 @@ npm run build
 Chrome: open `chrome://extensions`, enable Developer mode, choose Load
 unpacked and select `dist/`.
 
-Firefox (121 or later): open `about:debugging#/runtime/this-firefox`, choose
-Load Temporary Add-on and select `dist/manifest.json`. Firefox treats host
-permissions as optional, so grant "Access your data for all websites" from
-the extension's permissions page.
+Firefox (140 or later): open `about:debugging#/runtime/this-firefox`, choose
+Load Temporary Add-on and select `dist/manifest.json`, or run
+`npm run firefox:run`. Firefox treats host permissions as optional, so grant
+"Access your data for all websites" from the extension's permissions page.
+
+Firefox for Android (142 or later): enable USB debugging on the phone and
+remote debugging in Firefox settings, connect it, find its id with
+`adb devices`, then run `npm run firefox:android -- --android-device=<id>`.
+The popup opens full width from the Extensions entry of the browser menu.
+
+Other mobile browsers cannot run it: Chrome for Android and iOS has no
+extension support, and Safari would need a native app wrapper.
+
+`npm run firefox:lint` validates the build against Mozilla's add-on rules.
+The only expected warning is the ignored `background.service_worker` key,
+which Chrome uses while Firefox uses `background.scripts`.
 
 Response headers are captured while a page loads, so reload tabs that were
 already open before the extension was installed.
@@ -52,6 +64,10 @@ makes these requests, and only these:
 
 Captured response headers stay in the browser's session storage, one entry
 per tab, deleted when the tab closes or the browser quits.
+
+Because the hostname of the inspected site leaves the browser, the Firefox
+manifest declares the `browsingActivity` data collection category, which
+Firefox shows to the user at install time.
 
 ## Development
 
