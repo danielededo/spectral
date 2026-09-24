@@ -1,0 +1,24 @@
+{
+  "name": "spectral",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser extension that surfaces the infrastructure behind the site you are visiting",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test",
+    "firefox:lint": "web-ext lint --source-dir dist",
+    "firefox:run": "web-ext run --source-dir dist",
+    "firefox:android": "web-ext run --source-dir dist --target firefox-android"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.1",
+    "web-ext": "^10.7.0"
+  }
+}

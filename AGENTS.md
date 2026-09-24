@@ -1,28 +1,49 @@
-# scaffold
+# spectral
 
-Meta/template repository: the language-agnostic baseline (licensing, governance,
-documentation, contribution workflow) that new personal projects start from.
-Everything here is documentation or configuration; there is no code to build,
-test, or run.
+Browser extension (Manifest V3; Chromium browsers, Firefox, Firefox for
+Android) that shows the infrastructure behind the site in the active tab:
+CDN, hosting, network owner, DNS provider, email providers and
+domain-verified SaaS. It runs entirely
+client-side; there is no backend. See [ADR 0002](docs/adr/0002-client-only-extension.md).
 
 This file is the single source of truth for agent instructions, as prescribed
 by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 
 ## Commands
 
-- There is no build, test, or lint pipeline. Validation is manual: check that
-  Markdown renders correctly and that YAML files (`.github/*.yml`) stay parseable.
+- Install: `npm ci` (Node 22 or later).
+- Validate: `npm run check` (typecheck and unit tests; always run after editing).
+- Build: `npm run build` writes the unpacked extension to `dist/`.
+- Watch: `npm run dev` rebuilds `dist/` on change; reload the extension in the browser.
+- Firefox: `npm run firefox:lint` validates `dist/` for AMO (after a build);
+  `npm run firefox:run` and `npm run firefox:android -- --android-device=<id>`
+  launch it.
+
+## Architecture
+
+- `src/background.ts` is the service worker. It only observes `main_frame`
+  responses through `webRequest.onCompleted` and stores headers, status and
+  connected IP per tab in `chrome.storage.session` (`src/shared/capture.ts`).
+- `src/popup/` renders the panel. It reads the capture for the active tab and
+  runs DNS-over-HTTPS and RDAP lookups (`src/infrastructure/lookup.ts`) only
+  when the user opens the popup.
+- `src/infrastructure/detect.ts` holds every fingerprint rule and all parsing
+  as pure functions; `detect.test.ts` covers them. New providers are added as
+  rules there, each with a test.
 
 ## Conventions
 
 - Commits: Conventional Commits; see [docs/COMMIT-CONVENTION.md](docs/COMMIT-CONVENTION.md).
+  Scopes in use: `infra`, `popup`, `background`, `build`.
 - Branching: trunk-based; see [docs/BRANCHING-STRATEGY.md](docs/BRANCHING-STRATEGY.md)
   and [ADR 0001](docs/adr/0001-trunk-based-development.md).
 - All content (docs, comments, commit messages, file names) is written in
   English, no exceptions.
-- Per-project customization points use the placeholders `<PROJECT_NAME>`,
-  `<OWNER_HANDLE>`, `<SECURITY_CONTACT_EMAIL>`, `<CONTACT_EMAIL>`, `<YEAR>`,
-  `<COPYRIGHT_HOLDER>`, and `[TO BE FILLED IN]`; reuse them, don't invent new ones.
+- TypeScript strict mode, no UI framework. The popup builds the DOM with
+  `textContent` only: data from headers, DNS and RDAP is untrusted and must
+  never reach `innerHTML`.
+- A fingerprint needs evidence the user can check (a header name, a record);
+  it is shown next to the provider. Prefer no detection over a guess.
 
 ## Writing style
 
@@ -48,10 +69,11 @@ code comments.
 ## Boundaries
 
 - Never commit directly to `main`; every change goes through a pull request.
+- No backend and no telemetry. The only network calls are the DoH and RDAP
+  lookups listed in the README; adding another endpoint needs an ADR.
+- Keep permissions minimal. Adding a manifest permission or host pattern must
+  be justified in the pull request description.
 - `licenses/MIT.txt`, `licenses/APACHE-2.0.txt`, and the body of
-  `CODE_OF_CONDUCT.md` are canonical third-party texts: never reword them
-  (placeholders and the top note in the code of conduct are the only local parts).
-- Keep this repo language-agnostic: no language-specific tooling, manifests, or
-  CI; that boundary is documented in the README and is deliberate.
+  `CODE_OF_CONDUCT.md` are canonical third-party texts: never reword them.
 - When adding, renaming, or removing files, update the structure tree in
   `README.md` in the same pull request.

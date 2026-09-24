@@ -20,7 +20,10 @@ How to use this file:
 
 ### Added
 
-- [TO BE FILLED IN: first notable change of the project]
+- Infrastructure panel: CDN, hosting, WAF and web server from response
+  headers and CNAMEs; network owner via RDAP; DNS provider, MX and SPF
+  senders, CAA and domain-verified SaaS via DNS-over-HTTPS.
+- Firefox for Android support, with a full-width popup on touch screens.
 
 <!--
 ## [0.1.0] - YYYY-MM-DD
@@ -30,8 +33,8 @@ How to use this file:
 - Initial release.
 -->
 
-[Unreleased]: https://github.com/<OWNER_HANDLE>/<PROJECT_NAME>/commits/main
+[Unreleased]: https://github.com/danielededo/spectral/commits/main
 <!-- After the first release, switch to:
-[Unreleased]: https://github.com/<OWNER_HANDLE>/<PROJECT_NAME>/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/<OWNER_HANDLE>/<PROJECT_NAME>/releases/tag/v0.1.0
+[Unreleased]: https://github.com/danielededo/spectral/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/danielededo/spectral/releases/tag/v0.1.0
 -->

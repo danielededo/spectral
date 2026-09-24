@@ -1,4 +1,4 @@
-# Contributing to <PROJECT_NAME>
+# Contributing to spectral
 
 Thanks for taking the time to contribute! This project is maintained by a solo developer (or a small team), so the process is intentionally lightweight. The goal of this document is to make contributions smooth, not to add bureaucracy.
 
@@ -18,7 +18,7 @@ Thanks for taking the time to contribute! This project is maintained by a solo d
    - `docs/short-description` for documentation
 3. **Make your changes.** Keep the scope of each PR small and focused: one logical change per PR is much easier to review than a grab-bag.
 4. **Follow the commit convention.** This project uses [Conventional Commits](https://www.conventionalcommits.org/); see [docs/COMMIT-CONVENTION.md](docs/COMMIT-CONVENTION.md) for the format and examples.
-5. **Test your changes.** Run the project's test suite and linters before opening the PR. [TO BE FILLED IN: project-specific commands, e.g. `make test`]
+5. **Test your changes.** Run `npm run check` (typecheck and unit tests) and `npm run build` before opening the PR.
 6. **Update documentation** if your change affects behavior, configuration, or public APIs. Add an entry to the `Unreleased` section of `CHANGELOG.md` when the change is user-visible.
 7. **Open a pull request** against `main` and fill in the PR template.
 
