@@ -45,5 +45,4 @@ makes onboarding trivial if the project ever gains collaborators.
 | --- | --- | --- |
 | [0000](0000-template.md) | Template | n/a |
 | [0001](0001-trunk-based-development.md) | Use trunk-based development for this repository | Accepted |
-
-[TO BE FILLED IN: add a row per ADR as they are created]
+| [0002](0002-client-only-extension.md) | Ship spectral as a client-only browser extension | Accepted |

@@ -1,86 +1,126 @@
-# scaffold
+# spectral
 
-A meta/template repository with a sensible baseline for personal projects: licensing, governance, documentation, and contribution workflow. It is deliberately **not** language-specific: it contains the parts that every project needs regardless of stack.
+A browser extension that shows what runs behind the site in your current tab:
+the CDN and hosting in front of it, who owns the IP network, which provider
+serves its DNS and email, and which SaaS the domain has verified ownership
+with. Each finding comes with the header or DNS record that proves it.
 
-## What this repo is
+Status: early development, not yet published on any store.
 
-This repository is a starting point for new personal projects, both public and private. It collects the boilerplate that is easy to get wrong or to postpone forever:
+## Features
 
-- License texts and a guide for choosing between them
-- Community and governance files (`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`)
-- A changelog skeleton following [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/)
-- Documentation on branching strategies, commit conventions, and Architecture Decision Records (ADRs)
-- GitHub-specific configuration (issue and PR templates, `CODEOWNERS`, Dependabot)
-- Cross-language editor, line-ending, and ignore rules (`.editorconfig`, `.gitattributes`, `.gitignore`)
-- A checklist for the GitHub settings that files can't carry ([docs/REPO-SETTINGS.md](docs/REPO-SETTINGS.md))
+The Infrastructure panel is the first module. It groups findings into five
+sections:
 
-[TO BE FILLED IN: anything else this template grows to include]
+- Edge and hosting: CDN, hosting platform, WAF and web server, from response
+  headers and the CNAME chain.
+- Network: connected IP, A and AAAA records, and the RDAP network name, owner,
+  range and country.
+- DNS: zone apex, DNS provider recognized from the nameservers, NS and CAA
+  records.
+- Email: inbound provider from MX records and outbound senders from SPF
+  includes.
+- Verified services: SaaS inferred from domain verification TXT records.
 
-## How to use it as a template
+## Installation
 
-1. Click **Use this template** on GitHub (or clone and re-init: `git clone`, delete `.git`, `git init`).
-2. Search for the placeholders and replace them:
-   - `<PROJECT_NAME>`: the name of your new project
-   - `<OWNER_HANDLE>`: your GitHub username
-   - `<SECURITY_CONTACT_EMAIL>`: the address for vulnerability reports
-   - `<CONTACT_EMAIL>`: the code of conduct enforcement contact
-   - `<YEAR>` / `<COPYRIGHT_HOLDER>`: in the chosen license file
-   - `[TO BE FILLED IN]`: free-form sections that need project-specific content
-3. Pick a license: read [docs/LICENSE-GUIDE.md](docs/LICENSE-GUIDE.md), copy the right file from [licenses/](licenses/) to the repository root as `LICENSE`, and delete the `licenses/` directory.
-4. Rewrite this `README.md` for the actual project, starting from
-   [docs/README-TEMPLATE.md](docs/README-TEMPLATE.md).
-5. Configure the repository settings following [docs/REPO-SETTINGS.md](docs/REPO-SETTINGS.md).
-6. Delete what you don't need (see the notes below on optional files).
-7. Reset `CHANGELOG.md` to a fresh `Unreleased` section.
+```
+npm ci
+npm run build
+```
 
-### Optional files
+Chrome: open `chrome://extensions`, enable Developer mode, choose Load
+unpacked and select `dist/`.
 
-- **`CODE_OF_CONDUCT.md`**: included because it is useful the moment a public project receives external contributors, but it is optional: feel free to remove it for private or strictly personal repositories.
-- **`.github/CODEOWNERS`**: optional for single-maintainer projects; see the comments inside the file.
-- **`docs/adr/`**: keep it only if you intend to record architecture decisions.
+Firefox (121 or later): open `about:debugging#/runtime/this-firefox`, choose
+Load Temporary Add-on and select `dist/manifest.json`. Firefox treats host
+permissions as optional, so grant "Access your data for all websites" from
+the extension's permissions page.
 
-## What it does NOT include (and why)
+Response headers are captured while a page loads, so reload tabs that were
+already open before the extension was installed.
 
-- **Language-specific tooling** (linters, formatters, build files, package manifests): every stack has its own conventions and generators; duplicating them here would only go stale.
-- **CI/CD workflows**: pipelines depend heavily on the language, hosting, and deployment target. Add them per project.
-- **A `LICENSE` file at the root**: choosing a license is a per-project decision. The `licenses/` directory provides the candidates and `docs/LICENSE-GUIDE.md` explains how to choose.
-- **Issue tracker automation, bots, org policies**: this template targets personal projects maintained by one person or a small team, not an organization.
+## Privacy
+
+Spectral has no backend and sends no telemetry. When you open the popup it
+makes these requests, and only these:
+
+| Service | Receives | Purpose |
+| --- | --- | --- |
+| `cloudflare-dns.com` | the site's hostname and zone apex | DNS-over-HTTPS lookups of A, AAAA, SOA, NS, MX, TXT and CAA |
+| `rdap.org` and the regional registry it redirects to | one IP address of the site | network owner lookup |
+
+Captured response headers stay in the browser's session storage, one entry
+per tab, deleted when the tab closes or the browser quits.
+
+## Development
+
+```
+npm run check   # typecheck and unit tests
+npm run dev     # rebuild dist/ on change
+```
+
+Fingerprints live in `src/infrastructure/detect.ts` as pure rules with unit
+tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
 
 ## Structure
 
 ```
 /
-├── README.md                       # this file; replace with the project's own README
+├── README.md                       # this file
 ├── AGENTS.md                       # AI agent instructions (single source of truth)
 ├── CLAUDE.md                       # pointer to AGENTS.md
 ├── CONTRIBUTING.md                 # contribution workflow
-├── CODE_OF_CONDUCT.md              # Contributor Covenant (optional for private repos)
+├── CODE_OF_CONDUCT.md              # Contributor Covenant
 ├── SECURITY.md                     # how to report vulnerabilities
-├── CHANGELOG.md                    # Keep a Changelog + SemVer skeleton
-├── .editorconfig                   # cross-language editor rules
-├── .gitattributes                  # line-ending normalization and binary handling
-├── .gitignore                      # OS, IDE, and secrets ignores (not language-specific)
+├── CHANGELOG.md                    # Keep a Changelog + SemVer
+├── package.json                    # scripts and dev dependencies
+├── tsconfig.json
+├── vite.config.ts                  # builds popup and service worker into dist/
+├── public/
+│   └── manifest.json               # Manifest V3, shared by Chrome and Firefox
+├── src/
+│   ├── background.ts               # service worker: captures main_frame responses
+│   ├── shared/
+│   │   └── capture.ts              # per-tab capture in storage.session
+│   ├── infrastructure/
+│   │   ├── detect.ts               # fingerprint rules and parsers (pure)
+│   │   ├── detect.test.ts
+│   │   └── lookup.ts               # DNS-over-HTTPS and RDAP clients
+│   └── popup/
+│       ├── index.html
+│       ├── main.ts                 # renders the Infrastructure panel
+│       └── style.css
 ├── licenses/                       # license candidates; pick one, move to ./LICENSE
 │   ├── MIT.txt
 │   ├── APACHE-2.0.txt
 │   └── PROPRIETARY.txt
 ├── docs/
 │   ├── LICENSE-GUIDE.md            # how to choose a license
-│   ├── README-TEMPLATE.md          # README skeleton for new projects
-│   ├── REPO-SETTINGS.md            # GitHub settings checklist per repository
+│   ├── README-TEMPLATE.md          # README skeleton
+│   ├── REPO-SETTINGS.md            # GitHub settings checklist
 │   ├── BRANCHING-STRATEGY.md       # trunk-based/GitHub Flow vs release-based
 │   ├── COMMIT-CONVENTION.md        # Conventional Commits, with examples
-│   ├── AI-AGENTS.md                # guidelines for CLAUDE.md / AGENTS.md and agent setup
+│   ├── AI-AGENTS.md                # guidelines for CLAUDE.md / AGENTS.md
 │   └── adr/
-│       ├── README.md               # what ADRs are and how to use them
-│       ├── 0000-template.md        # ADR template
-│       └── 0001-trunk-based-development.md  # this repo's own branching decision
+│       ├── README.md               # what ADRs are and the index
+│       ├── 0000-template.md
+│       ├── 0001-trunk-based-development.md
+│       └── 0002-client-only-extension.md
 └── .github/
-    ├── CODEOWNERS                  # optional for single-maintainer projects
+    ├── CODEOWNERS
     ├── PULL_REQUEST_TEMPLATE.md
     ├── ISSUE_TEMPLATE/
     │   ├── bug_report.md
     │   ├── feature_request.md
     │   └── config.yml
-    └── dependabot.yml              # base config, adapt per ecosystem
+    ├── dependabot.yml              # npm and GitHub Actions updates
+    └── workflows/
+        └── ci.yml                  # check and build on pull requests
 ```
+
+## License
+
+[TO BE FILLED IN: pick a license from `licenses/` following
+[docs/LICENSE-GUIDE.md](docs/LICENSE-GUIDE.md).]
