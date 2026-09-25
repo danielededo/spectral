@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { realpathSync } from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
@@ -28,9 +30,10 @@ export const test = base.extend<Fixtures>({
     await context.close();
   },
 
-  extensionId: async ({ context }, use) => {
-    const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
-    await use(new URL(worker.url()).host);
+  // Chrome derives an unpacked extension's id from its path; waiting for the "serviceworker" event instead can hang.
+  extensionId: async ({}, use) => {
+    const hex = createHash("sha256").update(realpathSync(EXTENSION_DIR)).digest("hex").slice(0, 32);
+    await use([...hex].map((c) => String.fromCharCode(97 + parseInt(c, 16))).join(""));
   },
 
   site: async ({}, use) => {
@@ -74,14 +77,17 @@ export const test = base.extend<Fixtures>({
         await site.goto(tabUrl);
         const probe = await context.newPage();
         await probe.goto(popupUrl);
+        // The worker is reported before its webRequest listener exists, so a first load can go unseen; reload until captured.
         await expect
           .poll(async () => {
             const tabs = await probe.evaluate(() => chrome.tabs.query({}));
             const found = tabs.find((t) => t.url === tabUrl);
             if (!found?.id) return false;
-            const stored = await probe.evaluate((id) => chrome.storage.session.get(`capture:${id}`), found.id);
             tab = found;
-            return Object.keys(stored).length > 0;
+            const stored = await probe.evaluate((id) => chrome.storage.session.get(`capture:${id}`), found.id);
+            if ((stored[`capture:${found.id}`] as { url?: string } | undefined)?.url === tabUrl) return true;
+            await site.reload();
+            return false;
           })
           .toBe(true);
         await probe.close();
