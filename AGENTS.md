@@ -14,6 +14,11 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 - Install: `npm ci` (Node 22 or later).
 - Validate: `npm run check` (typecheck and unit tests; always run after editing).
 - Build: `npm run build` writes the unpacked extension to `dist/`.
+- End-to-end: `npm run test:e2e` drives the built extension in Chromium with
+  a fixture site and mocked DoH and RDAP; run it after `npm run build`. Set
+  `CHROMIUM_PATH` to use an existing Chromium instead of Playwright's.
+- Icons: `npm run icons` regenerates `public/icons/` from `scripts/icon.svg`;
+  commit both.
 - Watch: `npm run dev` rebuilds `dist/` on change; reload the extension in the browser.
 - Firefox: `npm run firefox:lint` validates `dist/` for AMO (after a build);
   `npm run firefox:run` and `npm run firefox:android -- --android-device=<id>`
@@ -30,6 +35,10 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 - `src/infrastructure/detect.ts` holds every fingerprint rule and all parsing
   as pure functions; `detect.test.ts` covers them. New providers are added as
   rules there, each with a test.
+- `e2e/` covers the wiring between service worker, storage and popup. The
+  popup's `chrome.tabs.query` is stubbed there because a popup opened as a
+  page would otherwise be its own active tab. A change to what the popup
+  renders comes with an end-to-end assertion.
 
 ## Conventions
 

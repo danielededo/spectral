@@ -24,6 +24,7 @@ How to use this file:
   headers and CNAMEs; network owner via RDAP; DNS provider, MX and SPF
   senders, CAA and domain-verified SaaS via DNS-over-HTTPS.
 - Firefox for Android support, with a full-width popup on touch screens.
+- Extension icons.
 
 <!--
 ## [0.1.0] - YYYY-MM-DD

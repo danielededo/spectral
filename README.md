@@ -72,9 +72,16 @@ Firefox shows to the user at install time.
 ## Development
 
 ```
-npm run check   # typecheck and unit tests
-npm run dev     # rebuild dist/ on change
+npm run check      # typecheck and unit tests
+npm run dev        # rebuild dist/ on change
+npm run test:e2e   # load dist/ in Chromium and drive the popup (build first)
+npm run icons      # regenerate public/icons/ from scripts/icon.svg
 ```
+
+The end-to-end tests need Playwright's Chromium, installed once with
+`npx playwright install chromium`, or an existing binary passed through the
+`CHROMIUM_PATH` environment variable. They serve a local fixture site and
+mock the DoH and RDAP responses, so they run offline.
 
 Fingerprints live in `src/infrastructure/detect.ts` as pure rules with unit
 tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
@@ -94,8 +101,17 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 ├── package.json                    # scripts and dev dependencies
 ├── tsconfig.json
 ├── vite.config.ts                  # builds popup and service worker into dist/
+├── playwright.config.ts            # end-to-end test runner
 ├── public/
-│   └── manifest.json               # Manifest V3, shared by Chrome and Firefox
+│   ├── manifest.json               # Manifest V3, shared by Chrome and Firefox
+│   └── icons/                      # generated PNGs, 16 to 128 px
+├── scripts/
+│   ├── icon.svg                    # icon source
+│   └── render-icons.ts             # renders icon.svg into public/icons/
+├── e2e/
+│   ├── fixtures.ts                 # extension context, fixture site, lookup mocks
+│   ├── infrastructure.e2e.ts
+│   └── tsconfig.json
 ├── src/
 │   ├── background.ts               # service worker: captures main_frame responses
 │   ├── shared/
@@ -133,7 +149,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
     │   └── config.yml
     ├── dependabot.yml              # npm and GitHub Actions updates
     └── workflows/
-        └── ci.yml                  # check and build on pull requests
+        └── ci.yml                  # check, build, Firefox lint and end-to-end tests
 ```
 
 ## License

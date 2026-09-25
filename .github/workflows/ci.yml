@@ -21,6 +21,13 @@ jobs:
       - run: npm run check
       - run: npm run build
       - run: npm run firefox:lint
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: e2e-results
+          path: test-results/
       - uses: actions/upload-artifact@v7
         with:
           name: spectral-extension
