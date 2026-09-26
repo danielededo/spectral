@@ -2,7 +2,7 @@
 
 Browser extension (Manifest V3; Chromium browsers, Firefox, Firefox for
 Android) that shows the infrastructure behind the site in the active tab:
-CDN, hosting, network owner, DNS provider, email providers and
+CDN, hosting, tech stack, network owner, DNS provider, email providers and
 domain-verified SaaS. It runs entirely
 client-side; there is no backend. See [ADR 0002](docs/adr/0002-client-only-extension.md).
 
@@ -35,6 +35,13 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 - `src/infrastructure/detect.ts` holds every fingerprint rule and all parsing
   as pure functions; `detect.test.ts` covers them. New providers are added as
   rules there, each with a test.
+- `src/techstack/probe.ts` is injected with `chrome.scripting.executeScript`
+  into the page's main world when the popup opens, so it can read globals such
+  as `jQuery.fn.jquery`. It must stay self-contained (it is serialized), must
+  not throw, and reads only the globals and selectors listed by the rules.
+  Its result is untrusted: `normalizeSnapshot` validates the shape and
+  `cleanVersion` keeps only version-shaped strings. Technology rules live in
+  `src/techstack/detect.ts`, each with a test.
 - `e2e/` covers the wiring between service worker, storage and popup. The
   popup's `chrome.tabs.query` is stubbed there because a popup opened as a
   page would otherwise be its own active tab. A change to what the popup
@@ -43,7 +50,7 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 ## Conventions
 
 - Commits: Conventional Commits; see [docs/COMMIT-CONVENTION.md](docs/COMMIT-CONVENTION.md).
-  Scopes in use: `infra`, `popup`, `background`, `build`.
+  Scopes in use: `infra`, `techstack`, `popup`, `background`, `build`.
 - Branching: trunk-based; see [docs/BRANCHING-STRATEGY.md](docs/BRANCHING-STRATEGY.md)
   and [ADR 0001](docs/adr/0001-trunk-based-development.md).
 - All content (docs, comments, commit messages, file names) is written in
