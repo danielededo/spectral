@@ -23,6 +23,8 @@ How to use this file:
 - Infrastructure panel: CDN, hosting, WAF and web server from response
   headers and CNAMEs; network owner via RDAP; DNS provider, MX and SPF
   senders, CAA and domain-verified SaaS via DNS-over-HTTPS.
+- Tech stack section: CMS, frameworks, libraries, UI kits, analytics,
+  commerce, consent and third-party services, with versions when exposed.
 - Firefox for Android support, with a full-width popup on touch screens.
 - Extension icons.
 - Released under the MIT License.

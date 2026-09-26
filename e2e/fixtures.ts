@@ -13,7 +13,7 @@ export type DohFixture = Record<string, { Status: number; Answer?: DohAnswer[]; 
 interface Fixtures {
   context: BrowserContext;
   extensionId: string;
-  site: (headers: Record<string, string>) => Promise<string>;
+  site: (headers: Record<string, string>, body?: string) => Promise<string>;
   rdapRequests: string[];
   mockLookups: (doh: DohFixture | "fail", rdap?: object) => Promise<void>;
   openPanel: (tabUrl: string) => Promise<Page>;
@@ -38,16 +38,21 @@ export const test = base.extend<Fixtures>({
 
   site: async ({}, use) => {
     const servers: http.Server[] = [];
-    await use(async (headers) => {
-      const server = http.createServer((_req, res) => {
+    await use(async (headers, body = "<h1>fixture</h1>") => {
+      const server = http.createServer((req, res) => {
+        if (req.url !== "/") {
+          res.writeHead(404).end();
+          return;
+        }
         res.writeHead(200, { "content-type": "text/html", ...headers });
-        res.end("<!doctype html><title>fixture</title><h1>fixture</h1>");
+        res.end(`<!doctype html><title>fixture</title>${body}`);
       });
       servers.push(server);
       await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
       return `http://localhost:${(server.address() as AddressInfo).port}/`;
     });
-    await Promise.all(servers.map((s) => new Promise((resolve) => s.close(resolve))));
+    // The browser keeps idle keep-alive sockets open, which would make close() wait forever.
+    await Promise.all(servers.map((s) => new Promise((resolve) => (s.close(resolve), s.closeAllConnections()))));
   },
 
   rdapRequests: async ({}, use) => {

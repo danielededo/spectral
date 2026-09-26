@@ -1,19 +1,24 @@
 # spectral
 
 A browser extension that shows what runs behind the site in your current tab:
-the CDN and hosting in front of it, who owns the IP network, which provider
-serves its DNS and email, and which SaaS the domain has verified ownership
-with. Each finding comes with the header or DNS record that proves it.
+the CDN and hosting in front of it, the frameworks and libraries it is built
+with, who owns the IP network, which provider serves its DNS and email, and
+which SaaS the domain has verified ownership with. Each finding comes with the
+header, DNS record or page element that proves it.
 
 Status: early development, not yet published on any store.
 
 ## Features
 
-The Infrastructure panel is the first module. It groups findings into five
-sections:
+The panel groups findings into six sections:
 
 - Edge and hosting: CDN, hosting platform, WAF and web server, from response
   headers and the CNAME chain.
+- Tech stack: CMS, frameworks, JavaScript libraries, UI kits and fonts,
+  analytics, commerce, consent and other third-party services, with versions
+  when the page exposes them. It reads the generator meta tag, script and
+  stylesheet URLs, a fixed list of well-known globals and DOM markers, and the
+  captured response headers.
 - Network: connected IP, A and AAAA records, and the RDAP network name, owner,
   range and country.
 - DNS: zone apex, DNS provider recognized from the nameservers, NS and CAA
@@ -63,7 +68,9 @@ makes these requests, and only these:
 | `rdap.org` and the regional registry it redirects to | one IP address of the site | network owner lookup |
 
 Captured response headers stay in the browser's session storage, one entry
-per tab, deleted when the tab closes or the browser quits.
+per tab, deleted when the tab closes or the browser quits. The tech stack is
+read from the open page when the popup opens and analyzed in the popup; none
+of it is stored or sent anywhere.
 
 Because the hostname of the inspected site leaves the browser, the Firefox
 manifest declares the `browsingActivity` data collection category, which
@@ -83,7 +90,8 @@ The end-to-end tests need Playwright's Chromium, installed once with
 `CHROMIUM_PATH` environment variable. They serve a local fixture site and
 mock the DoH and RDAP responses, so they run offline.
 
-Fingerprints live in `src/infrastructure/detect.ts` as pure rules with unit
+Fingerprints live in `src/infrastructure/detect.ts` and
+`src/techstack/detect.ts` as pure rules with unit
 tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
 
@@ -112,6 +120,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 ├── e2e/
 │   ├── fixtures.ts                 # extension context, fixture site, lookup mocks
 │   ├── infrastructure.e2e.ts
+│   ├── techstack.e2e.ts
 │   └── tsconfig.json
 ├── src/
 │   ├── background.ts               # service worker: captures main_frame responses
@@ -121,9 +130,13 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   │   ├── detect.ts               # fingerprint rules and parsers (pure)
 │   │   ├── detect.test.ts
 │   │   └── lookup.ts               # DNS-over-HTTPS and RDAP clients
+│   ├── techstack/
+│   │   ├── probe.ts                # runs in the page, collects raw markers
+│   │   ├── detect.ts               # technology rules, snapshot validation (pure)
+│   │   └── detect.test.ts
 │   └── popup/
 │       ├── index.html
-│       ├── main.ts                 # renders the Infrastructure panel
+│       ├── main.ts                 # renders the panel
 │       └── style.css
 ├── docs/
 │   ├── README-TEMPLATE.md          # README skeleton
