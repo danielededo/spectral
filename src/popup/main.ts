@@ -12,6 +12,8 @@ import {
 } from "../infrastructure/detect";
 import { lookupIp, resolveHost, resolveZone } from "../infrastructure/lookup";
 import { type Capture, loadCapture } from "../shared/capture";
+import { GLOBAL_PATHS, MARKER_QUERIES, type Tech, type TechCategory, detectTech, normalizeSnapshot } from "../techstack/detect";
+import { type PageSnapshot, probePage } from "../techstack/probe";
 
 const CATEGORY_LABEL: Record<Category, string> = {
   cdn: "CDN",
@@ -22,6 +24,18 @@ const CATEGORY_LABEL: Record<Category, string> = {
   mail: "inbound mail",
   sender: "sends mail",
   saas: "verified",
+};
+
+const TECH_LABEL: Record<TechCategory, string> = {
+  framework: "framework",
+  cms: "CMS",
+  library: "JS library",
+  analytics: "analytics",
+  commerce: "commerce",
+  runtime: "server runtime",
+  ui: "UI and fonts",
+  service: "service",
+  consent: "cookie consent",
 };
 
 type Child = Node | string | null;
@@ -40,21 +54,51 @@ function section(title: string): { root: HTMLElement; body: HTMLElement } {
   return { root, body };
 }
 
-function signalList(signals: Signal[], empty: string): HTMLElement {
-  if (signals.length === 0) return el("p", "muted", empty);
+function findingList(items: Array<{ title: string; tag: string; evidence: string[] }>, empty: string): HTMLElement {
+  if (items.length === 0) return el("p", "muted", empty);
   return el(
     "div",
     undefined,
-    ...signals.map((s) =>
+    ...items.map((item) =>
       el(
         "div",
         "signal",
-        el("span", "provider", s.provider),
-        el("span", "tag", CATEGORY_LABEL[s.category]),
-        el("span", "evidence", s.evidence.join(" · ")),
+        el("span", "provider", item.title),
+        el("span", "tag", item.tag),
+        el("span", "evidence", item.evidence.join(" · ")),
       ),
     ),
   );
+}
+
+const signalList = (signals: Signal[], empty: string) =>
+  findingList(
+    signals.map((s) => ({ title: s.provider, tag: CATEGORY_LABEL[s.category], evidence: s.evidence })),
+    empty,
+  );
+
+const techList = (techs: Tech[], empty: string) =>
+  findingList(
+    techs.map((t) => ({
+      title: t.version ? `${t.name} ${t.version}` : t.name,
+      tag: TECH_LABEL[t.category],
+      evidence: t.evidence,
+    })),
+    empty,
+  );
+
+async function readPage(tabId: number): Promise<PageSnapshot | null> {
+  try {
+    const [injection] = await chrome.scripting.executeScript({
+      target: { tabId },
+      world: "MAIN",
+      func: probePage,
+      args: [GLOBAL_PATHS, MARKER_QUERIES],
+    });
+    return normalizeSnapshot(injection?.result);
+  } catch {
+    return null;
+  }
 }
 
 function facts(rows: Array<[string, string | string[] | null]>): HTMLElement {
@@ -89,12 +133,14 @@ async function main(): Promise<void> {
     return;
   }
 
+  const tabId = tab.id;
   const hostname = url.hostname;
-  const stored = await loadCapture(tab.id);
+  const stored = await loadCapture(tabId);
   const capture = stored && new URL(stored.url).hostname === hostname ? stored : null;
   hostLine.textContent = `${hostname} · ${captureNote(capture)}`;
 
   const edge = section("Edge and hosting");
+  const tech = section("Tech stack");
   const network = section("Network");
   const dns = section("DNS");
   const mail = section("Email");
@@ -110,6 +156,15 @@ async function main(): Promise<void> {
     return [
       signalList(signals, "No known CDN or hosting provider fingerprint."),
       records?.cnames.length ? facts([["CNAME chain", records.cnames]]) : null,
+    ];
+  });
+
+  void fill(tech.body, async () => {
+    const snapshot = await readPage(tabId);
+    const techs = detectTech(snapshot, capture?.headers ?? {});
+    return [
+      techList(techs, "No known framework, CMS or library fingerprint."),
+      snapshot ? null : el("p", "muted", "The browser does not let extensions read this page; showing header findings only."),
     ];
   });
 
