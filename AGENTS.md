@@ -82,7 +82,7 @@ code comments.
   lookups listed in the README; adding another endpoint needs an ADR.
 - Keep permissions minimal. Adding a manifest permission or host pattern must
   be justified in the pull request description.
-- `licenses/MIT.txt`, `licenses/APACHE-2.0.txt`, and the body of
-  `CODE_OF_CONDUCT.md` are canonical third-party texts: never reword them.
+- `LICENSE` (MIT) and the body of `CODE_OF_CONDUCT.md` are canonical
+  third-party texts: never reword them.
 - When adding, renaming, or removing files, update the structure tree in
   `README.md` in the same pull request.

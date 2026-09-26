@@ -25,6 +25,7 @@ How to use this file:
   senders, CAA and domain-verified SaaS via DNS-over-HTTPS.
 - Firefox for Android support, with a full-width popup on touch screens.
 - Extension icons.
+- Released under the MIT License.
 
 <!--
 ## [0.1.0] - YYYY-MM-DD

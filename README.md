@@ -98,6 +98,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 ├── CODE_OF_CONDUCT.md              # Contributor Covenant
 ├── SECURITY.md                     # how to report vulnerabilities
 ├── CHANGELOG.md                    # Keep a Changelog + SemVer
+├── LICENSE                         # MIT
 ├── package.json                    # scripts and dev dependencies
 ├── tsconfig.json
 ├── vite.config.ts                  # builds popup and service worker into dist/
@@ -124,12 +125,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │       ├── index.html
 │       ├── main.ts                 # renders the Infrastructure panel
 │       └── style.css
-├── licenses/                       # license candidates; pick one, move to ./LICENSE
-│   ├── MIT.txt
-│   ├── APACHE-2.0.txt
-│   └── PROPRIETARY.txt
 ├── docs/
-│   ├── LICENSE-GUIDE.md            # how to choose a license
 │   ├── README-TEMPLATE.md          # README skeleton
 │   ├── REPO-SETTINGS.md            # GitHub settings checklist
 │   ├── BRANCHING-STRATEGY.md       # trunk-based/GitHub Flow vs release-based
@@ -154,5 +150,4 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 
 ## License
 
-[TO BE FILLED IN: pick a license from `licenses/` following
-[docs/LICENSE-GUIDE.md](docs/LICENSE-GUIDE.md).]
+Distributed under the MIT License; see [LICENSE](LICENSE).
