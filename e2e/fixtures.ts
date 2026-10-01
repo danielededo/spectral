@@ -8,6 +8,7 @@ import { type BrowserContext, type Page, test as base, chromium, expect } from "
 const EXTENSION_DIR = path.resolve(import.meta.dirname, "../dist");
 
 type DohAnswer = { name: string; type: number; TTL: number; data: string };
+// Keyed by record type, or by "TYPE name" to answer one name differently.
 export type DohFixture = Record<string, { Status: number; Answer?: DohAnswer[]; Authority?: DohAnswer[] }>;
 
 interface Fixtures {
@@ -63,8 +64,10 @@ export const test = base.extend<Fixtures>({
     await use(async (doh, rdap = {}) => {
       await context.route("https://cloudflare-dns.com/**", (route) => {
         if (doh === "fail") return route.fulfill({ status: 503, body: "unavailable" });
-        const type = new URL(route.request().url()).searchParams.get("type") ?? "";
-        return route.fulfill({ contentType: "application/dns-json", body: JSON.stringify(doh[type] ?? { Status: 0 }) });
+        const params = new URL(route.request().url()).searchParams;
+        const type = params.get("type") ?? "";
+        const answer = doh[`${type} ${params.get("name")}`] ?? doh[type] ?? { Status: 0 };
+        return route.fulfill({ contentType: "application/dns-json", body: JSON.stringify(answer) });
       });
       await context.route("https://rdap.org/**", (route) => {
         rdapRequests.push(route.request().url());

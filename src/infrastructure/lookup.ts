@@ -81,6 +81,22 @@ export async function resolveZone(hostname: string): Promise<ZoneRecords> {
   };
 }
 
+export interface MailPolicyRecords {
+  dmarc: string[];
+  mtaSts: string[];
+  tlsRpt: string[];
+}
+
+export async function resolveMailPolicy(apex: string): Promise<MailPolicyRecords> {
+  const txt = async (name: string) => answers(await doh(name, "TXT"), "TXT").map(parseTxt);
+  const [dmarc, mtaSts, tlsRpt] = await Promise.all([
+    txt(`_dmarc.${apex}`),
+    txt(`_mta-sts.${apex}`),
+    txt(`_smtp._tls.${apex}`),
+  ]);
+  return { dmarc, mtaSts, tlsRpt };
+}
+
 export interface IpNetwork {
   ip: string;
   name: string | null;

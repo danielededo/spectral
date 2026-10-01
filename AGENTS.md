@@ -34,7 +34,10 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
   when the user opens the popup.
 - `src/infrastructure/detect.ts` holds every fingerprint rule and all parsing
   as pure functions; `detect.test.ts` covers them. New providers are added as
-  rules there, each with a test.
+  rules there, each with a test. Email authentication policies (SPF, DMARC,
+  MTA-STS, TLS-RPT) are parsed and described in `src/infrastructure/mail.ts`.
+  The MTA-STS policy file itself is not fetched: that would be a request to
+  the inspected domain, a new endpoint under the boundary below.
 - `src/techstack/probe.ts` is injected with `chrome.scripting.executeScript`
   into the page's main world when the popup opens, so it can read globals such
   as `jQuery.fn.jquery`. It must stay self-contained (it is serialized), must

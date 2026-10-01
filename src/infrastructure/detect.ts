@@ -1,4 +1,4 @@
-export type Category = "cdn" | "hosting" | "waf" | "server" | "dns" | "mail" | "sender" | "saas";
+export type Category = "cdn" | "hosting" | "waf" | "server" | "dns" | "mail" | "sender" | "reports" | "saas";
 
 export interface Signal {
   category: Category;
