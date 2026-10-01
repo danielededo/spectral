@@ -19,6 +19,12 @@ const DOH: DohFixture = {
     ],
   },
   CAA: { Status: 0, Answer: [record("example.it", 257, '0 issue "letsencrypt.org"')] },
+  "TXT _dmarc.example.it": {
+    Status: 0,
+    Answer: [record("_dmarc.example.it", 16, '"v=DMARC1; p=quarantine; pct=50; rua=mailto:abc@rua.easydmarc.eu"')],
+  },
+  "TXT _mta-sts.example.it": { Status: 0, Answer: [record("_mta-sts.example.it", 16, '"v=STSv1; id=20260901"')] },
+  "TXT _smtp._tls.example.it": { Status: 0 },
 };
 
 const RDAP = {
@@ -54,6 +60,12 @@ test("reports every section from headers, DNS and RDAP", async ({ site, mockLook
   const mail = section(popup, "Email");
   await expect(mail).toContainText("OVHcloud");
   await expect(mail).toContainText("SPF include sendgrid.net");
+  await expect(mail).toContainText("~all: other senders soft-fail");
+  await expect(mail).toContainText("quarantine, applied to 50% of mail");
+  await expect(mail).toContainText("EasyDMARC");
+  await expect(mail).toContainText("report address @rua.easydmarc.eu");
+  await expect(mail).toContainText("published (policy id 20260901)");
+  await expect(mail).toContainText("TLS-RPTnot published");
 
   await expect(section(popup, "Verified services")).toContainText("Google Search Console");
 });
