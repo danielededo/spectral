@@ -23,6 +23,9 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 - Firefox: `npm run firefox:lint` validates `dist/` for AMO (after a build);
   `npm run firefox:run` and `npm run firefox:android -- --android-device=<id>`
   launch it.
+- Safari on iOS: `.github/workflows/safari.yml` runs on a macOS runner, only on
+  demand or when the workflow itself changes, because macOS minutes cost ten
+  times as much. It is experimental; see the README for sideloading.
 
 ## Architecture
 
