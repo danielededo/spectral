@@ -10,7 +10,18 @@ import {
   mergeSignals,
   spfIncludes,
 } from "../infrastructure/detect";
-import { lookupIp, resolveHost, resolveZone } from "../infrastructure/lookup";
+import { lookupIp, resolveHost, resolveMailPolicy, resolveZone } from "../infrastructure/lookup";
+import {
+  describeDmarc,
+  describeMtaSts,
+  describeSpf,
+  describeTlsRpt,
+  detectReporters,
+  evaluateDmarc,
+  evaluateMtaSts,
+  evaluateSpf,
+  evaluateTlsRpt,
+} from "../infrastructure/mail";
 import { type Capture, loadCapture } from "../shared/capture";
 import { GLOBAL_PATHS, MARKER_QUERIES, type Tech, type TechCategory, detectTech, normalizeSnapshot } from "../techstack/detect";
 import { type PageSnapshot, probePage } from "../techstack/probe";
@@ -23,6 +34,7 @@ const CATEGORY_LABEL: Record<Category, string> = {
   dns: "DNS",
   mail: "inbound mail",
   sender: "sends mail",
+  reports: "DMARC reports",
   saas: "verified",
 };
 
@@ -200,15 +212,23 @@ async function main(): Promise<void> {
 
   void fill(mail.body, async () => {
     const z = await zone;
+    const policy = await resolveMailPolicy(z.apex).catch(() => null);
+    const dmarc = policy ? evaluateDmarc(policy.dmarc) : null;
     const signals = mergeSignals([
       ...detectFromMx(z.mx.map((m) => m.host)),
       ...detectFromTxt(z.txt).filter((s) => s.category === "sender"),
+      ...(dmarc?.status === "ok" ? detectReporters(dmarc.rua) : []),
     ]);
     return [
       signalList(signals, z.mx.length ? "Mail provider not recognized." : "No MX records: the domain receives no email."),
       facts([
         ["MX", z.mx.map((m) => `${m.priority} ${m.host}`)],
+        ["SPF", describeSpf(evaluateSpf(z.txt))],
         ["SPF includes", spfIncludes(z.txt)],
+        ["DMARC", dmarc ? describeDmarc(dmarc) : "lookup failed"],
+        ["DMARC reports", dmarc?.status === "ok" ? dmarc.rua : null],
+        ["MTA-STS", policy ? describeMtaSts(evaluateMtaSts(policy.mtaSts)) : "lookup failed"],
+        ["TLS-RPT", policy ? describeTlsRpt(evaluateTlsRpt(policy.tlsRpt)) : "lookup failed"],
       ]),
     ];
   });
