@@ -127,6 +127,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   ├── manifest.json               # Manifest V3, shared by Chrome and Firefox
 │   └── icons/                      # generated PNGs, 16 to 128 px
 ├── scripts/
+│   ├── build.ts                    # builds the popup, then the background as one classic script
 │   ├── icon.svg                    # icon source
 │   └── render-icons.ts             # renders icon.svg into public/icons/
 ├── e2e/

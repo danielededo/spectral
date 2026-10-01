@@ -13,7 +13,10 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 
 - Install: `npm ci` (Node 22 or later).
 - Validate: `npm run check` (typecheck and unit tests; always run after editing).
-- Build: `npm run build` writes the unpacked extension to `dist/`.
+- Build: `npm run build` writes the unpacked extension to `dist/` through
+  `scripts/build.ts`: the popup with `vite.config.ts`, then the background as
+  a single IIFE with no imports, because Safari does not load module
+  background scripts.
 - End-to-end: `npm run test:e2e` drives the built extension in Chromium with
   a fixture site and mocked DoH and RDAP; run it after `npm run build`. Set
   `CHROMIUM_PATH` to use an existing Chromium instead of Playwright's.

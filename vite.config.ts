@@ -3,14 +3,11 @@ import { defineConfig } from "vite";
 export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist",
-    emptyOutDir: true,
+    emptyOutDir: false,
     sourcemap: mode === "development",
     modulePreload: { polyfill: false },
     rollupOptions: {
-      input: {
-        popup: "src/popup/index.html",
-        background: "src/background.ts",
-      },
+      input: { popup: "src/popup/index.html" },
       output: {
         entryFileNames: "[name].js",
         chunkFileNames: "chunks/[name]-[hash].js",
