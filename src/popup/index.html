@@ -11,7 +11,22 @@
       <h1>Spectral</h1>
       <p id="host" class="muted"></p>
     </header>
-    <main id="sections"></main>
+    <main id="pages">
+      <div class="page" id="page-site" role="tabpanel" aria-labelledby="tab-site"></div>
+      <div class="page" id="page-network" role="tabpanel" aria-labelledby="tab-network"></div>
+      <div class="page" id="page-email" role="tabpanel" aria-labelledby="tab-email"></div>
+    </main>
+    <nav class="pager" role="tablist" aria-label="Pages">
+      <button type="button" role="tab" id="tab-site" aria-controls="page-site" aria-selected="true">
+        <span class="dot"></span>Site
+      </button>
+      <button type="button" role="tab" id="tab-network" aria-controls="page-network" aria-selected="false" tabindex="-1">
+        <span class="dot"></span>Network
+      </button>
+      <button type="button" role="tab" id="tab-email" aria-controls="page-email" aria-selected="false" tabindex="-1">
+        <span class="dot"></span>Email
+      </button>
+    </nav>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
