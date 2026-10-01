@@ -38,16 +38,18 @@ jobs:
             --ios-only --swift --copy-resources \
             --no-open --no-prompt --force 2>&1 | tee build/converter.log
 
-      - name: Prefix the extension bundle id with the app's
+      - name: Normalize bundle ids
         env:
           APP_ID: it.danielededo.spectral
         run: |
-          # Xcode refuses an embedded extension whose id does not start with the app id,
-          # which the converter does not guarantee.
+          # The converter capitalizes the app id from the app name (it.danielededo.Spectral), so the
+          # extension id no longer starts with it and xcodebuild rejects the embedded extension.
           PBX=$(find build/safari -maxdepth 4 -name project.pbxproj | head -1)
           grep -n 'PRODUCT_BUNDLE_IDENTIFIER' "$PBX"
-          perl -pi -e 's/(PRODUCT_BUNDLE_IDENTIFIER = )"?([^";]+)"?;/$1 . ($2 eq $ENV{APP_ID} ? $2 : "$ENV{APP_ID}.Extension") . ";"/e' "$PBX"
+          perl -pi -e 's/(PRODUCT_BUNDLE_IDENTIFIER = )"?([^";]+)"?;/my ($k, $v) = ($1, $2); $k . ($v =~ m{\.extension$}i ? "$ENV{APP_ID}.Extension" : $ENV{APP_ID}) . ";"/e' "$PBX"
           grep -n 'PRODUCT_BUNDLE_IDENTIFIER' "$PBX"
+          ids=$(grep -o 'PRODUCT_BUNDLE_IDENTIFIER = [^;]*' "$PBX" | sed 's/.* = //' | sort -u | tr '\n' ' ')
+          test "$ids" = "$APP_ID $APP_ID.Extension "
 
       - name: Build the app for iPhone without signing
         run: |
@@ -67,7 +69,13 @@ jobs:
         run: |
           APP=$(find build/derived/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
           test -n "$APP"
-          ls "$APP/PlugIns"
+          APPEX=$(find "$APP/PlugIns" -maxdepth 1 -name '*.appex' | head -1)
+          test -n "$APPEX"
+          app_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          ext_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APPEX/Info.plist")
+          echo "App: $app_id, extension: $ext_id"
+          test "$app_id" = "it.danielededo.spectral"
+          test "$ext_id" = "it.danielededo.spectral.Extension"
           mkdir -p build/ipa/Payload
           cp -R "$APP" build/ipa/Payload/
           (cd build/ipa && zip -qry ../Spectral-unsigned.ipa Payload)
