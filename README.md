@@ -24,7 +24,9 @@ The panel groups findings into six sections:
 - DNS: zone apex, DNS provider recognized from the nameservers, NS and CAA
   records.
 - Email: inbound provider from MX records and outbound senders from SPF
-  includes.
+  includes; what the SPF policy does with other senders; the DMARC policy,
+  its coverage and alignment, where reports go and which service collects
+  them; whether MTA-STS and TLS-RPT are published.
 - Verified services: SaaS inferred from domain verification TXT records.
 
 ## Installation
@@ -64,7 +66,7 @@ makes these requests, and only these:
 
 | Service | Receives | Purpose |
 | --- | --- | --- |
-| `cloudflare-dns.com` | the site's hostname and zone apex | DNS-over-HTTPS lookups of A, AAAA, SOA, NS, MX, TXT and CAA |
+| `cloudflare-dns.com` | the site's hostname and zone apex | DNS-over-HTTPS lookups of A, AAAA, SOA, NS, MX, TXT and CAA, plus TXT at `_dmarc`, `_mta-sts` and `_smtp._tls` under the apex |
 | `rdap.org` and the regional registry it redirects to | one IP address of the site | network owner lookup |
 
 Captured response headers stay in the browser's session storage, one entry
@@ -129,6 +131,8 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   ├── infrastructure/
 │   │   ├── detect.ts               # fingerprint rules and parsers (pure)
 │   │   ├── detect.test.ts
+│   │   ├── mail.ts                 # SPF, DMARC, MTA-STS and TLS-RPT parsing (pure)
+│   │   ├── mail.test.ts
 │   │   └── lookup.ts               # DNS-over-HTTPS and RDAP clients
 │   ├── techstack/
 │   │   ├── probe.ts                # runs in the page, collects raw markers
