@@ -10,7 +10,9 @@ Status: early development, not yet published on any store.
 
 ## Features
 
-The panel groups findings into six sections:
+The panel groups findings into six sections over three pages, Site, Network
+and Email, reached by swiping, by the labelled dots at the bottom, or with the
+left and right arrow keys:
 
 - Edge and hosting: CDN, hosting platform, WAF and web server, from response
   headers and the CNAME chain.
@@ -141,6 +143,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   └── popup/
 │       ├── index.html
 │       ├── main.ts                 # renders the panel
+│       ├── pager.ts                # page strip: tabs, arrow keys, swipe
 │       └── style.css
 ├── docs/
 │   ├── README-TEMPLATE.md          # README skeleton

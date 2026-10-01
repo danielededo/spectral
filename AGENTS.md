@@ -31,7 +31,9 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
   connected IP per tab in `chrome.storage.session` (`src/shared/capture.ts`).
 - `src/popup/` renders the panel. It reads the capture for the active tab and
   runs DNS-over-HTTPS and RDAP lookups (`src/infrastructure/lookup.ts`) only
-  when the user opens the popup.
+  when the user opens the popup. Sections live on three pages (Site, Network,
+  Email) in a horizontally scroll-snapped strip; `src/popup/pager.ts` keeps
+  the labelled dots, which follow the ARIA tabs pattern, in sync with it.
 - `src/infrastructure/detect.ts` holds every fingerprint rule and all parsing
   as pure functions; `detect.test.ts` covers them. New providers are added as
   rules there, each with a test. Email authentication policies (SPF, DMARC,
