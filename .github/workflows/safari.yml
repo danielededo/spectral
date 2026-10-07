@@ -1,0 +1,103 @@
+name: Safari iOS (unsigned, experimental)
+
+# macOS minutes are billed at ten times the Linux rate on private repositories,
+# so this runs on demand and only when this file changes, not on every pull request.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/safari.yml"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ipa:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Convert to a Safari Web Extension project
+        run: |
+          mkdir -p build
+          xcrun safari-web-extension-converter dist \
+            --project-location build/safari \
+            --app-name Spectral \
+            --bundle-identifier it.danielededo.spectral \
+            --ios-only --swift --copy-resources \
+            --no-open --no-prompt --force 2>&1 | tee build/converter.log
+
+      - name: Normalize bundle ids
+        env:
+          APP_ID: it.danielededo.spectral
+        run: |
+          # The converter capitalizes the app id from the app name (it.danielededo.Spectral), so the
+          # extension id no longer starts with it and xcodebuild rejects the embedded extension.
+          PBX=$(find build/safari -maxdepth 4 -name project.pbxproj | head -1)
+          grep -n 'PRODUCT_BUNDLE_IDENTIFIER' "$PBX"
+          perl -pi -e 's/(PRODUCT_BUNDLE_IDENTIFIER = )"?([^";]+)"?;/my ($k, $v) = ($1, $2); $k . ($v =~ m{\.extension$}i ? "$ENV{APP_ID}.Extension" : $ENV{APP_ID}) . ";"/e' "$PBX"
+          grep -n 'PRODUCT_BUNDLE_IDENTIFIER' "$PBX"
+          ids=$(grep -o 'PRODUCT_BUNDLE_IDENTIFIER = [^;]*' "$PBX" | sed 's/.* = //' | sort -u | tr '\n' ' ')
+          test "$ids" = "$APP_ID $APP_ID.Extension "
+
+      - name: Build the app for iPhone without signing
+        run: |
+          PROJECT=$(find build/safari -maxdepth 3 -name '*.xcodeproj' | head -1)
+          SCHEME=$(xcodebuild -list -json -project "$PROJECT" | jq -r '.project.schemes[0]')
+          echo "Project: $PROJECT, scheme: $SCHEME"
+          status=0
+          xcodebuild -project "$PROJECT" -scheme "$SCHEME" \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/derived \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build > build/xcodebuild.log 2>&1 || status=$?
+          grep -E 'error:|\*\* BUILD' build/xcodebuild.log || true
+          exit "$status"
+
+      - name: Package the .ipa
+        run: |
+          APP=$(find build/derived/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
+          test -n "$APP"
+          APPEX=$(find "$APP/PlugIns" -maxdepth 1 -name '*.appex' | head -1)
+          test -n "$APPEX"
+          app_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist")
+          ext_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APPEX/Info.plist")
+          echo "App: $app_id, extension: $ext_id"
+          test "$app_id" = "it.danielededo.spectral"
+          test "$ext_id" = "it.danielededo.spectral.Extension"
+          mkdir -p build/ipa/Payload
+          cp -R "$APP" build/ipa/Payload/
+          (cd build/ipa && zip -qry ../Spectral-unsigned.ipa Payload)
+          ls -l build/Spectral-unsigned.ipa
+
+      - name: Report converter warnings
+        if: always()
+        run: |
+          {
+            echo '### safari-web-extension-converter'
+            echo '```'
+            cat build/converter.log 2>/dev/null || echo "no output"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: spectral-ios-unsigned
+          path: build/Spectral-unsigned.ipa
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: safari-build-logs
+          path: build/*.log

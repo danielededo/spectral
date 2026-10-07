@@ -51,8 +51,18 @@ remote debugging in Firefox settings, connect it, find its id with
 `adb devices`, then run `npm run firefox:android -- --android-device=<id>`.
 The popup opens full width from the Extensions entry of the browser menu.
 
-Other mobile browsers cannot run it: Chrome for Android and iOS has no
-extension support, and Safari would need a native app wrapper.
+Chrome for Android and the other iOS browsers have no extension support.
+
+Safari on iPhone (experimental): the `Safari iOS` workflow converts the build
+into a Safari Web Extension inside a small iOS app and compiles it without a
+signature, on a GitHub-hosted Mac. Run it from the Actions tab, download the
+`spectral-ios-unsigned` artifact, then sign and install the `.ipa` from
+Windows or macOS with Sideloadly and a free Apple ID. On the iPhone, enable
+Developer Mode (Settings, Privacy and Security), trust the developer profile
+(Settings, General, VPN and Device Management), and turn the extension on in
+Settings, Apps, Safari, Extensions. A free Apple ID signature expires after
+seven days. Whether Safari exposes response headers to extensions is not yet
+verified, so the header-based findings may be missing there.
 
 `npm run firefox:lint` validates the build against Mozilla's add-on rules.
 The only expected warning is the ignored `background.service_worker` key,
@@ -119,6 +129,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   ├── manifest.json               # Manifest V3, shared by Chrome and Firefox
 │   └── icons/                      # generated PNGs, 16 to 128 px
 ├── scripts/
+│   ├── build.ts                    # builds the popup, then the background as one classic script
 │   ├── icon.svg                    # icon source
 │   └── render-icons.ts             # renders icon.svg into public/icons/
 ├── e2e/
@@ -165,7 +176,8 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
     │   └── config.yml
     ├── dependabot.yml              # npm and GitHub Actions updates
     └── workflows/
-        └── ci.yml                  # check, build, Firefox lint and end-to-end tests
+        ├── ci.yml                  # check, build, Firefox lint and end-to-end tests
+        └── safari.yml              # on demand: unsigned iOS app with the Safari extension
 ```
 
 ## License
