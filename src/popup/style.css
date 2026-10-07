@@ -39,6 +39,8 @@ body {
   body {
     width: auto;
     height: 100vh;
+    /* Mobile Safari counts its toolbar in 100vh, which would push the page dots off screen. */
+    height: 100dvh;
     max-height: none;
     font-size: 15px;
   }
