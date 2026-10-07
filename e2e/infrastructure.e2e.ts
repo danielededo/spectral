@@ -94,4 +94,5 @@ test("asks for a website on non-web tabs", async ({ openPanel }) => {
   const popup = await openPanel("chrome://extensions/");
   await expect(popup.locator("#host")).toHaveText("Open a website (http or https) to inspect it.");
   await expect(popup.locator("section")).toHaveCount(0);
+  await expect(popup.getByRole("tablist")).toBeHidden();
 });

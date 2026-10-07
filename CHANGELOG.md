@@ -27,6 +27,8 @@ How to use this file:
   report collector, MTA-STS and TLS-RPT.
 - Tech stack section: CMS, frameworks, libraries, UI kits, analytics,
   commerce, consent and third-party services, with versions when exposed.
+- Popup split into three pages, Site, Network and Email, with labelled dots,
+  swipe and arrow-key navigation.
 - Firefox for Android support, with a full-width popup on touch screens.
 - Extension icons.
 - Released under the MIT License.

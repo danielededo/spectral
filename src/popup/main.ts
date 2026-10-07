@@ -23,6 +23,7 @@ import {
   evaluateTlsRpt,
 } from "../infrastructure/mail";
 import { type Capture, loadCapture } from "../shared/capture";
+import { setupPager } from "./pager";
 import { GLOBAL_PATHS, MARKER_QUERIES, type Tech, type TechCategory, detectTech, normalizeSnapshot } from "../techstack/detect";
 import { type PageSnapshot, probePage } from "../techstack/probe";
 
@@ -59,10 +60,10 @@ function el(tag: string, className?: string, ...children: Child[]): HTMLElement 
   return node;
 }
 
-function section(title: string): { root: HTMLElement; body: HTMLElement } {
+function section(pageId: string, title: string): { root: HTMLElement; body: HTMLElement } {
   const body = el("div", undefined, el("p", "muted", "Looking up..."));
   const root = el("section", undefined, el("h2", undefined, title), body);
-  document.getElementById("sections")!.append(root);
+  document.getElementById(pageId)!.append(root);
   return { root, body };
 }
 
@@ -142,6 +143,7 @@ async function main(): Promise<void> {
   const url = tab?.url ? new URL(tab.url) : null;
   if (!tab?.id || !url || !/^https?:$/.test(url.protocol)) {
     hostLine.textContent = "Open a website (http or https) to inspect it.";
+    document.body.classList.add("idle");
     return;
   }
 
@@ -151,12 +153,13 @@ async function main(): Promise<void> {
   const capture = stored && new URL(stored.url).hostname === hostname ? stored : null;
   hostLine.textContent = `${hostname} · ${captureNote(capture)}`;
 
-  const edge = section("Edge and hosting");
-  const tech = section("Tech stack");
-  const network = section("Network");
-  const dns = section("DNS");
-  const mail = section("Email");
-  const services = section("Verified services");
+  setupPager(document.getElementById("pages")!, [...document.querySelectorAll<HTMLButtonElement>(".pager [role=tab]")]);
+  const edge = section("page-site", "Edge and hosting");
+  const tech = section("page-site", "Tech stack");
+  const network = section("page-network", "Network");
+  const dns = section("page-network", "DNS");
+  const mail = section("page-email", "Email");
+  const services = section("page-email", "Verified services");
 
   const host = resolveHost(hostname);
   const zone = resolveZone(hostname);
