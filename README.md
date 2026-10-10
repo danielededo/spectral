@@ -91,6 +91,10 @@ Because the hostname of the inspected site leaves the browser, the Firefox
 manifest declares the `browsingActivity` data collection category, which
 Firefox shows to the user at install time.
 
+The full policy is published at <https://spectral.danielededo.it/privacy>. It
+is served from the `site` repository (`src/data/spectralPrivacy.ts`), so change
+it there whenever the table above changes.
+
 ## Development
 
 ```
