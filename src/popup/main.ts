@@ -197,6 +197,7 @@ async function main(): Promise<void> {
         ["Owner", owner?.organization ?? null],
         ["Range", owner?.range ?? null],
         ["Country", owner?.country ?? null],
+        ["Registered address", owner?.location ?? null],
       ]),
     ];
   });

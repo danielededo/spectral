@@ -22,7 +22,8 @@ left and right arrow keys:
   stylesheet URLs, a fixed list of well-known globals and DOM markers, and the
   captured response headers.
 - Network: connected IP, A and AAAA records, and the RDAP network name, owner,
-  range and country.
+  range, country and the owner's registered address (where the network is
+  registered, not where the server physically is).
 - DNS: zone apex, DNS provider recognized from the nameservers, NS and CAA
   records.
 - Email: inbound provider from MX records and outbound senders from SPF

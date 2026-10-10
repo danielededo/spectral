@@ -102,6 +102,8 @@ export interface IpNetwork {
   name: string | null;
   organization: string | null;
   country: string | null;
+  /** Registered address of the network owner, not where the servers are. */
+  location: string | null;
   range: string | null;
 }
 
@@ -124,6 +126,29 @@ function entityName(entity: RdapEntity): string | null {
   return typeof fn?.[3] === "string" ? fn[3] : null;
 }
 
+// RFC 6350 `adr`: [pobox, ext, street, locality, region, code, country]. Some
+// registries leave those empty and give a multi-line `label` parameter instead.
+function entityLocation(entity: RdapEntity): string | null {
+  const adr = entity.vcardArray?.[1].find(([key]) => key === "adr");
+  if (!adr) return null;
+  const [, params, , value] = adr;
+  const parts = Array.isArray(value) ? value : [];
+  const structured = [parts[3], parts[4]].filter((p): p is string => typeof p === "string" && p.trim() !== "");
+  if (structured.length) return structured.map((p) => p.trim()).join(", ");
+  const label = (params as { label?: unknown } | null)?.label;
+  if (typeof label !== "string") return null;
+  const lines = label.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  return lines.length ? lines.join(", ") : null;
+}
+
+function firstLocation(entities: RdapEntity[] | undefined): string | null {
+  for (const entity of entities ?? []) {
+    const location = entityLocation(entity);
+    if (location) return location;
+  }
+  return null;
+}
+
 export function summarizeRdap(ip: string, data: RdapIp): IpNetwork {
   const cidr = data.cidr0_cidrs?.[0];
   const prefix = cidr?.v4prefix ?? cidr?.v6prefix;
@@ -138,6 +163,7 @@ export function summarizeRdap(ip: string, data: RdapIp): IpNetwork {
     name: data.name ?? null,
     organization: registrant ? entityName(registrant) : null,
     country: data.country ?? null,
+    location: (registrant ? entityLocation(registrant) : null) ?? firstLocation(data.entities),
     range,
   };
 }

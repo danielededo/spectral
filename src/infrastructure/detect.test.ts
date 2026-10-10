@@ -154,8 +154,38 @@ describe("summarizeRdap", () => {
       name: "CLOUDFLARENET",
       organization: "Cloudflare, Inc.",
       country: "US",
+      location: null,
       range: "104.16.0.0/13",
     });
+  });
+
+  it("reads the registrant location from a structured adr", () => {
+    const summary = summarizeRdap("104.16.1.1", {
+      entities: [
+        {
+          roles: ["registrant"],
+          vcardArray: [
+            "vcard",
+            [
+              ["fn", {}, "text", "Cloudflare, Inc."],
+              ["adr", {}, "text", ["", "", "101 Townsend Street", "San Francisco", "CA", "94107", "US"]],
+            ],
+          ],
+        },
+      ],
+    });
+    expect(summary.location).toBe("San Francisco, CA");
+  });
+
+  it("falls back to the adr label and to another entity", () => {
+    const label = { label: "1 Main St\nBerlin\nDE" };
+    const summary = summarizeRdap("2.3.4.5", {
+      entities: [
+        { roles: ["registrant"], vcardArray: ["vcard", [["fn", {}, "text", "Example GmbH"]]] },
+        { roles: ["technical"], vcardArray: ["vcard", [["adr", label, "text", ["", "", "", "", "", "", ""]]]] },
+      ],
+    });
+    expect(summary.location).toBe("1 Main St, Berlin, DE");
   });
 
   it("falls back to the address range when there is no CIDR", () => {
