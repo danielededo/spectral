@@ -11,9 +11,15 @@ export function setupPager(pages: HTMLElement, tabs: HTMLButtonElement[]): void 
   };
   const resizeObserver = new ResizeObserver(fit);
   Array.from(pages.children).forEach((page) => resizeObserver.observe(page));
+  // Changing the height while the strip is still scrolling makes scroll-snap
+  // restart the animation, so refit only once scrolling has settled.
+  let settle: ReturnType<typeof setTimeout> | undefined;
+  const fitWhenSettled = () => {
+    clearTimeout(settle);
+    settle = setTimeout(fit, 120);
+  };
 
   const select = (index: number) => {
-    fit();
     tabs.forEach((tab, i) => {
       tab.setAttribute("aria-selected", String(i === index));
       tab.tabIndex = i === index ? 0 : -1;
@@ -28,7 +34,14 @@ export function setupPager(pages: HTMLElement, tabs: HTMLButtonElement[]): void 
   };
 
   tabs.forEach((tab, i) => tab.addEventListener("click", () => go(i)));
-  pages.addEventListener("scroll", () => select(current()), { passive: true });
+  pages.addEventListener(
+    "scroll",
+    () => {
+      select(current());
+      fitWhenSettled();
+    },
+    { passive: true },
+  );
   document.addEventListener("keydown", (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === "ArrowRight") go(current() + 1);
