@@ -23,6 +23,9 @@ How to use this file:
 - Infrastructure panel: CDN, hosting, WAF and web server from response
   headers and CNAMEs; network owner via RDAP; DNS provider, MX and SPF
   senders, CAA and domain-verified SaaS via DNS-over-HTTPS.
+- Network section: the network owner's registered address (city and region),
+  when the registry publishes it. It is where the network is registered, not
+  where the server physically is.
 - Email security in the Email section: SPF policy, DMARC policy and its
   report collector, MTA-STS and TLS-RPT.
 - Tech stack section: CMS, frameworks, libraries, UI kits, analytics,
