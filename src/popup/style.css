@@ -93,6 +93,8 @@ h2 {
 
 #pages {
   display: flex;
+  /* Pages keep their own height; pager.ts sizes this box to the active page. */
+  align-items: flex-start;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;

@@ -2,7 +2,18 @@ export function setupPager(pages: HTMLElement, tabs: HTMLButtonElement[]): void 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const current = () => Math.round(pages.scrollLeft / Math.max(pages.clientWidth, 1));
 
+  // Desktop popups size #pages to the active page so a short page does not
+  // inherit the height of the tallest one. Mobile fills the screen via flex.
+  const fillsScreen = matchMedia("(pointer: coarse)");
+  const fit = () => {
+    const active = pages.children[current()] as HTMLElement | undefined;
+    pages.style.height = fillsScreen.matches || !active ? "" : `${active.offsetHeight}px`;
+  };
+  const resizeObserver = new ResizeObserver(fit);
+  Array.from(pages.children).forEach((page) => resizeObserver.observe(page));
+
   const select = (index: number) => {
+    fit();
     tabs.forEach((tab, i) => {
       tab.setAttribute("aria-selected", String(i === index));
       tab.tabIndex = i === index ? 0 : -1;
