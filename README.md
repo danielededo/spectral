@@ -182,6 +182,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
     ├── dependabot.yml              # npm and GitHub Actions updates
     └── workflows/
         ├── ci.yml                  # check, build, Firefox lint and end-to-end tests
+        ├── release.yml             # on a v* tag: store zip attached to a GitHub Release
         └── safari.yml              # on demand: unsigned iOS app with the Safari extension
 ```
 
