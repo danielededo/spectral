@@ -54,6 +54,7 @@ tmp/
 ### Project build output
 node_modules/
 dist/
+dist-firefox/
 build/
 test-results/
 playwright-report/

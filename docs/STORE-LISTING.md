@@ -6,7 +6,7 @@ ask for nearly the same.
 
 ## Package
 
-The version in the store is the `version` of `public/manifest.json`; it must
+The version in the store is the `version` of `src/manifest.json`; it must
 increase with every upload. Keep `package.json` on the same version.
 
 To release, bump both versions on a branch, merge it, then tag the merge
@@ -18,8 +18,16 @@ git push origin v0.2.0
 ```
 
 The `Release` workflow checks that the tag matches both versions, runs the
-checks, builds, and attaches `spectral-<version>.zip` to a GitHub Release.
-Upload that file to the store as it is.
+checks, builds, and attaches two packages to a GitHub Release. Upload them to
+the stores as they are:
+
+- `spectral-<version>-chromium.zip`: Edge Add-ons and Chrome Web Store.
+- `spectral-<version>-firefox.zip`: Firefox AMO.
+
+They differ only in `manifest.json`. Chromium stores reject
+`background.scripts` under Manifest V3 and Firefox has no background service
+workers, so each build declares only its own background key, and only the
+Firefox one carries `browser_specific_settings`.
 
 To build the package by hand instead:
 
@@ -28,9 +36,10 @@ npm ci
 npm run build
 ```
 
-Zip the **contents** of `dist/` (the `manifest.json` at the root of the
-archive, not inside a folder). The result for `0.1.0` is about 21 KB and
-holds nine files. `store/*.zip` is ignored by git.
+Zip the **contents** of `dist/` (Chromium) or `dist-firefox/` (Firefox),
+with the `manifest.json` at the root of the archive, not inside a folder.
+Each package is about 21 KB and holds nine files. `store/*.zip` is ignored by
+git.
 
 ## Texts
 

@@ -13,17 +13,21 @@ by [docs/AI-AGENTS.md](docs/AI-AGENTS.md); `CLAUDE.md` is a pointer to it.
 
 - Install: `npm ci` (Node 22 or later).
 - Validate: `npm run check` (typecheck and unit tests; always run after editing).
-- Build: `npm run build` writes the unpacked extension to `dist/` through
-  `scripts/build.ts`: the popup with `vite.config.ts`, then the background as
-  a single IIFE with no imports, because Safari does not load module
-  background scripts.
+- Build: `npm run build` writes the unpacked extension to `dist/` (Chromium
+  browsers and Safari) and `dist-firefox/` through `scripts/build.ts`: the
+  popup with `vite.config.ts`, then the background as a single IIFE with no
+  imports, because Safari does not load module background scripts.
+- Manifest: edit `src/manifest.json`, never a built one. `scripts/manifest.ts`
+  adds `background.service_worker` for Chromium (whose stores reject
+  `background.scripts`) or `background.scripts` for Firefox, and keeps
+  `browser_specific_settings` only for Firefox.
 - End-to-end: `npm run test:e2e` drives the built extension in Chromium with
   a fixture site and mocked DoH and RDAP; run it after `npm run build`. Set
   `CHROMIUM_PATH` to use an existing Chromium instead of Playwright's.
 - Icons: `npm run icons` regenerates `public/icons/` from `scripts/icon.svg`;
   commit both.
-- Watch: `npm run dev` rebuilds `dist/` on change; reload the extension in the browser.
-- Firefox: `npm run firefox:lint` validates `dist/` for AMO (after a build);
+- Watch: `npm run dev` rebuilds `dist/` and `dist-firefox/` on change; reload the extension in the browser.
+- Firefox: `npm run firefox:lint` validates `dist-firefox/` for AMO (after a build);
   `npm run firefox:run` and `npm run firefox:android -- --android-device=<id>`
   launch it.
 - Safari on iOS: `.github/workflows/safari.yml` runs on a macOS runner, only on

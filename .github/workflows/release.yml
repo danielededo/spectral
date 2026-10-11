@@ -1,7 +1,7 @@
 name: Release
 
-# Pushing a tag such as v0.1.0 builds the store package and attaches it to a
-# GitHub Release, so every uploaded version stays downloadable.
+# Pushing a tag such as v0.1.1 builds the store packages (Chromium and Firefox) and
+# attaches them to a GitHub Release, so every uploaded version stays downloadable.
 on:
   push:
     tags: ["v*"]
@@ -21,7 +21,7 @@ jobs:
 
       - name: Check the tag matches the manifest version
         run: |
-          manifest=$(jq -r .version public/manifest.json)
+          manifest=$(jq -r .version src/manifest.json)
           pkg=$(jq -r .version package.json)
           echo "Tag: $GITHUB_REF_NAME, manifest: $manifest, package.json: $pkg"
           test "$GITHUB_REF_NAME" = "v$manifest"
@@ -33,14 +33,17 @@ jobs:
       - run: npm run build
       - run: npm run firefox:lint
 
-      - name: Zip the contents of dist/
+      - name: Zip the contents of each build
         run: |
-          (cd dist && zip -qrX "../spectral-$VERSION.zip" .)
-          unzip -l "spectral-$VERSION.zip"
+          (cd dist && zip -qrX "../spectral-$VERSION-chromium.zip" .)
+          (cd dist-firefox && zip -qrX "../spectral-$VERSION-firefox.zip" .)
+          unzip -l "spectral-$VERSION-chromium.zip"
+          unzip -l "spectral-$VERSION-firefox.zip"
 
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "spectral-$VERSION.zip" \
+          gh release create "$GITHUB_REF_NAME" \
+            "spectral-$VERSION-chromium.zip" "spectral-$VERSION-firefox.zip" \
             --title "Spectral $VERSION" --generate-notes --verify-tag
