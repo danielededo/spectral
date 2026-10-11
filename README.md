@@ -1,4 +1,32 @@
-# spectral
+<p align="center">
+  <img src="scripts/icon.svg" width="96" height="96" alt="">
+</p>
+
+<h1 align="center">Spectral</h1>
+
+<p align="center">
+  See what runs behind any website: CDN, hosting, tech stack, network owner,
+  DNS and email setup, with the evidence for each.
+</p>
+
+<p align="center">
+  <a href="https://github.com/danielededo/spectral/actions/workflows/ci.yml"><img src="https://github.com/danielededo/spectral/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/danielededo/spectral/releases/latest"><img src="https://img.shields.io/github/v/release/danielededo/spectral" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/danielededo/spectral" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="#installation">Install</a> ·
+  <a href="https://spectral.danielededo.it/privacy">Privacy policy</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/danielededo/spectral/issues">Report a problem</a>
+</p>
+
+<p align="center">
+  <img src="store/edge/screenshot-1.png" width="32%" alt="Site page: edge, hosting and tech stack of wordpress.org">
+  <img src="store/edge/screenshot-2.png" width="32%" alt="Network page: IP addresses and network owner">
+  <img src="store/edge/screenshot-3.png" width="32%" alt="Email page: DNS provider, mail servers and policies">
+</p>
 
 A browser extension that shows what runs behind the site in your current tab:
 the CDN and hosting in front of it, the frameworks and libraries it is built
@@ -6,7 +34,8 @@ with, who owns the IP network, which provider serves its DNS and email, and
 which SaaS the domain has verified ownership with. Each finding comes with the
 header, DNS record or page element that proves it.
 
-Status: early development, not yet published on any store.
+Status: early development. Submitted to Microsoft Edge Add-ons and in review;
+not yet on the Chrome Web Store or Firefox Add-ons.
 
 ## Features
 
@@ -34,21 +63,28 @@ left and right arrow keys:
 
 ## Installation
 
+Each [release](https://github.com/danielededo/spectral/releases/latest)
+carries two packages: `spectral-<version>-chromium.zip` for Chrome and Edge,
+and `spectral-<version>-firefox.zip` for Firefox. Extract the Chromium one and
+load the folder as described below; Firefox loads the zip directly as a
+temporary add-on.
+
+To build from source instead:
+
 ```
 npm ci
 npm run build
 ```
 
 The build writes `dist/` for Chromium browsers and Safari, and
-`dist-firefox/` for Firefox; they differ only in `manifest.json`. Packaged
-builds of each release are attached to the
-[GitHub Releases](https://github.com/danielededo/spectral/releases).
+`dist-firefox/` for Firefox; they differ only in `manifest.json`.
 
 Chrome and Edge: open `chrome://extensions` (or `edge://extensions`), enable
-Developer mode, choose Load unpacked and select `dist/`.
+Developer mode, choose Load unpacked and select `dist/` (or the extracted
+release folder).
 
 Firefox (140 or later): open `about:debugging#/runtime/this-firefox`, choose
-Load Temporary Add-on and select `dist-firefox/manifest.json`, or run
+Load Temporary Add-on and select `dist-firefox/manifest.json` (or the release zip), or run
 `npm run firefox:run`. Firefox treats host permissions as optional, so grant
 "Access your data for all websites" from the extension's permissions page.
 
@@ -117,6 +153,15 @@ Fingerprints live in `src/infrastructure/detect.ts` and
 `src/techstack/detect.ts` as pure rules with unit
 tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow.
+
+More documents:
+
+- [docs/STORE-LISTING.md](docs/STORE-LISTING.md): store texts, permission
+  justifications, images and the release steps.
+- [docs/adr/](docs/adr/README.md): architecture decisions, such as why there
+  is no backend.
+- [SECURITY.md](SECURITY.md): how to report a vulnerability privately.
+- [CHANGELOG.md](CHANGELOG.md): what changed in each version.
 
 ## Structure
 
