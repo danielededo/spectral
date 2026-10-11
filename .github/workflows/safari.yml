@@ -1,7 +1,7 @@
 name: Safari iOS (unsigned, experimental)
 
-# macOS minutes are billed at ten times the Linux rate on private repositories,
-# so this runs on demand and only when this file changes, not on every pull request.
+# The iOS build is experimental and slow on macOS runners, so it runs on demand and
+# only when this file changes, not on every pull request.
 on:
   workflow_dispatch:
   pull_request:
