@@ -1,0 +1,46 @@
+name: Release
+
+# Pushing a tag such as v0.1.0 builds the store package and attaches it to a
+# GitHub Release, so every uploaded version stays downloadable.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check the tag matches the manifest version
+        run: |
+          manifest=$(jq -r .version public/manifest.json)
+          pkg=$(jq -r .version package.json)
+          echo "Tag: $GITHUB_REF_NAME, manifest: $manifest, package.json: $pkg"
+          test "$GITHUB_REF_NAME" = "v$manifest"
+          test "$pkg" = "$manifest"
+          echo "VERSION=$manifest" >> "$GITHUB_ENV"
+
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - run: npm run firefox:lint
+
+      - name: Zip the contents of dist/
+        run: |
+          (cd dist && zip -qrX "../spectral-$VERSION.zip" .)
+          unzip -l "spectral-$VERSION.zip"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "spectral-$VERSION.zip" \
+            --title "Spectral $VERSION" --generate-notes --verify-tag
