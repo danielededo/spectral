@@ -69,7 +69,7 @@ git.
 
 **Privacy policy URL:** https://spectral.danielededo.it/privacy
 
-**Website / support URL:** https://github.com/danielededo/spectral (the repository must be public for this to work; until then use the policy page)
+**Website / support URL:** https://github.com/danielededo/spectral (issues for support)
 
 ## Single purpose
 
