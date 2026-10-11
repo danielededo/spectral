@@ -1,19 +1,15 @@
 # Security Policy
 
-This project is maintained by a solo developer (or a small team). Security reports
-are taken seriously, but please keep in mind that response times are best-effort,
-not backed by a dedicated security team.
+Spectral is maintained by a solo developer. Security reports are taken
+seriously, but response times are best-effort, not backed by a dedicated
+security team.
 
 ## Reporting a vulnerability
 
 **Please do not open a public issue for security problems.**
 
-Instead, use one of these private channels:
-
-1. **GitHub private vulnerability reporting** (preferred, if enabled for this
-   repository): go to the **Security** tab and click **Report a vulnerability**.
-2. **Email**: send a report to `<SECURITY_CONTACT_EMAIL>` with a subject line
-   starting with `[SECURITY]`.
+Instead, use GitHub private vulnerability reporting: go to the **Security**
+tab of this repository and click **Report a vulnerability**.
 
 A useful report includes:
 
@@ -36,15 +32,8 @@ publicly. Coordinated disclosure protects users of the project.
 
 ## Supported versions
 
-Unless stated otherwise below, only the **latest release** (and the `main`
-branch) receive security fixes.
-
-| Version | Supported |
-| ------- | --------- |
-| latest  | yes       |
-| older   | no        |
-
-[TO BE FILLED IN: adjust this table if the project maintains multiple release lines]
+Only the **latest release** (and the `main` branch) receive security fixes.
+Store versions are updated to the latest release.
 
 ## Scope notes
 

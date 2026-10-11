@@ -168,8 +168,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │       ├── pager.ts                # page strip: tabs, arrow keys, swipe
 │       └── style.css
 ├── docs/
-│   ├── README-TEMPLATE.md          # README skeleton
-│   ├── REPO-SETTINGS.md            # GitHub settings checklist
+│   ├── STORE-LISTING.md            # store texts, permission justifications, images, release steps
 │   ├── BRANCHING-STRATEGY.md       # trunk-based/GitHub Flow vs release-based
 │   ├── COMMIT-CONVENTION.md        # Conventional Commits, with examples
 │   ├── AI-AGENTS.md                # guidelines for CLAUDE.md / AGENTS.md
@@ -179,7 +178,6 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │       ├── 0001-trunk-based-development.md
 │       └── 0002-client-only-extension.md
 └── .github/
-    ├── CODEOWNERS
     ├── PULL_REQUEST_TEMPLATE.md
     ├── ISSUE_TEMPLATE/
     │   ├── bug_report.md
