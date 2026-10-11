@@ -18,6 +18,15 @@ How to use this file:
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-11
+
+### Fixed
+
+- Separate packages for Chromium browsers and Firefox, each declaring only
+  its own background key, so the Edge Add-ons store accepts the package.
+
+## [0.1.0] - 2026-10-11
+
 ### Added
 
 - Infrastructure panel: CDN, hosting, WAF and web server from response
@@ -36,21 +45,6 @@ How to use this file:
 - Extension icons.
 - Released under the MIT License.
 
-### Fixed
-
-- Separate packages for Chromium browsers and Firefox, each declaring only
-  its own background key, so the Edge Add-ons store accepts the package.
-
-<!--
-## [0.1.0] - YYYY-MM-DD
-
-### Added
-
-- Initial release.
--->
-
-[Unreleased]: https://github.com/danielededo/spectral/commits/main
-<!-- After the first release, switch to:
-[Unreleased]: https://github.com/danielededo/spectral/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/danielededo/spectral/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/danielededo/spectral/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/danielededo/spectral/releases/tag/v0.1.0
--->
