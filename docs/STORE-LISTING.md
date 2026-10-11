@@ -4,6 +4,12 @@ Everything a browser extension store asks for, written once. The Edge column
 is what Microsoft Partner Center asks for; Chrome Web Store and Firefox AMO
 ask for nearly the same.
 
+## Published listings
+
+| Store | Listing | Since |
+| --- | --- | --- |
+| Microsoft Edge Add-ons | [ljoalgbbmkfgcihfgeanhkocoklokbll](https://microsoftedge.microsoft.com/addons/detail/spectral/ljoalgbbmkfgcihfgeanhkocoklokbll) | 0.1.1, 2026-10-11 |
+
 ## Package
 
 The version in the store is the `version` of `src/manifest.json`; it must

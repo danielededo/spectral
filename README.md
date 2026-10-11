@@ -12,11 +12,13 @@
 <p align="center">
   <a href="https://github.com/danielededo/spectral/actions/workflows/ci.yml"><img src="https://github.com/danielededo/spectral/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/danielededo/spectral/releases/latest"><img src="https://img.shields.io/github/v/release/danielededo/spectral" alt="Latest release"></a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/spectral/ljoalgbbmkfgcihfgeanhkocoklokbll"><img src="https://img.shields.io/badge/dynamic/json?label=Edge%20Add-ons&query=%24.version&url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fljoalgbbmkfgcihfgeanhkocoklokbll" alt="Edge Add-ons"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/danielededo/spectral" alt="MIT License"></a>
 </p>
 
 <p align="center">
-  <a href="#installation">Install</a> ·
+  <a href="https://microsoftedge.microsoft.com/addons/detail/spectral/ljoalgbbmkfgcihfgeanhkocoklokbll">Get it for Edge</a> ·
+  <a href="#installation">Other browsers</a> ·
   <a href="https://spectral.danielededo.it/privacy">Privacy policy</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="https://github.com/danielededo/spectral/issues">Report a problem</a>
@@ -34,8 +36,9 @@ with, who owns the IP network, which provider serves its DNS and email, and
 which SaaS the domain has verified ownership with. Each finding comes with the
 header, DNS record or page element that proves it.
 
-Status: early development. Submitted to Microsoft Edge Add-ons and in review;
-not yet on the Chrome Web Store or Firefox Add-ons.
+Status: early development. Available on
+[Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/spectral/ljoalgbbmkfgcihfgeanhkocoklokbll); not yet on the
+Chrome Web Store or Firefox Add-ons.
 
 ## Features
 
@@ -63,7 +66,10 @@ left and right arrow keys:
 
 ## Installation
 
-Each [release](https://github.com/danielededo/spectral/releases/latest)
+Edge: install from [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/spectral/ljoalgbbmkfgcihfgeanhkocoklokbll).
+Updates arrive automatically.
+
+For other browsers, each [release](https://github.com/danielededo/spectral/releases/latest)
 carries two packages: `spectral-<version>-chromium.zip` for Chrome and Edge,
 and `spectral-<version>-firefox.zip` for Firefox. Extract the Chromium one and
 load the folder as described below; Firefox loads the zip directly as a
