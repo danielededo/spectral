@@ -36,6 +36,11 @@ How to use this file:
 - Extension icons.
 - Released under the MIT License.
 
+### Fixed
+
+- Separate packages for Chromium browsers and Firefox, each declaring only
+  its own background key, so the Edge Add-ons store accepts the package.
+
 <!--
 ## [0.1.0] - YYYY-MM-DD
 

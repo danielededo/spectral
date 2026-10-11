@@ -1,6 +1,6 @@
 {
   "name": "spectral",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Browser extension that surfaces the infrastructure behind the site you are visiting",
   "license": "MIT",
@@ -11,9 +11,9 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e",
     "test": "vitest run",
     "check": "npm run typecheck && npm run test",
-    "firefox:lint": "web-ext lint --source-dir dist",
-    "firefox:run": "web-ext run --source-dir dist",
-    "firefox:android": "web-ext run --source-dir dist --target firefox-android",
+    "firefox:lint": "web-ext lint --source-dir dist-firefox",
+    "firefox:run": "web-ext run --source-dir dist-firefox",
+    "firefox:android": "web-ext run --source-dir dist-firefox --target firefox-android",
     "test:e2e": "playwright test",
     "icons": "node scripts/render-icons.ts"
   },

@@ -39,11 +39,16 @@ npm ci
 npm run build
 ```
 
-Chrome: open `chrome://extensions`, enable Developer mode, choose Load
-unpacked and select `dist/`.
+The build writes `dist/` for Chromium browsers and Safari, and
+`dist-firefox/` for Firefox; they differ only in `manifest.json`. Packaged
+builds of each release are attached to the
+[GitHub Releases](https://github.com/danielededo/spectral/releases).
+
+Chrome and Edge: open `chrome://extensions` (or `edge://extensions`), enable
+Developer mode, choose Load unpacked and select `dist/`.
 
 Firefox (140 or later): open `about:debugging#/runtime/this-firefox`, choose
-Load Temporary Add-on and select `dist/manifest.json`, or run
+Load Temporary Add-on and select `dist-firefox/manifest.json`, or run
 `npm run firefox:run`. Firefox treats host permissions as optional, so grant
 "Access your data for all websites" from the extension's permissions page.
 
@@ -65,9 +70,8 @@ Settings, Apps, Safari, Extensions. A free Apple ID signature expires after
 seven days. Whether Safari exposes response headers to extensions is not yet
 verified, so the header-based findings may be missing there.
 
-`npm run firefox:lint` validates the build against Mozilla's add-on rules.
-The only expected warning is the ignored `background.service_worker` key,
-which Chrome uses while Firefox uses `background.scripts`.
+`npm run firefox:lint` validates the Firefox build against Mozilla's add-on
+rules and is expected to report no warnings.
 
 Response headers are captured while a page loads, so reload tabs that were
 already open before the extension was installed.
@@ -99,7 +103,7 @@ it there whenever the table above changes.
 
 ```
 npm run check      # typecheck and unit tests
-npm run dev        # rebuild dist/ on change
+npm run dev        # rebuild dist/ and dist-firefox/ on change
 npm run test:e2e   # load dist/ in Chromium and drive the popup (build first)
 npm run icons      # regenerate public/icons/ from scripts/icon.svg
 ```
@@ -128,13 +132,14 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 ├── LICENSE                         # MIT
 ├── package.json                    # scripts and dev dependencies
 ├── tsconfig.json
-├── vite.config.ts                  # builds popup and service worker into dist/
+├── vite.config.ts                  # popup build settings
 ├── playwright.config.ts            # end-to-end test runner
 ├── public/
-│   ├── manifest.json               # Manifest V3, shared by Chrome and Firefox
 │   └── icons/                      # generated PNGs, 16 to 128 px
 ├── scripts/
-│   ├── build.ts                    # builds the popup, then the background as one classic script
+│   ├── build.ts                    # builds dist/ (Chromium) and dist-firefox/: popup, then background
+│   ├── manifest.ts                 # writes each build's manifest.json from src/manifest.json
+│   ├── manifest.test.ts
 │   ├── icon.svg                    # icon source
 │   └── render-icons.ts             # renders icon.svg into public/icons/
 ├── e2e/
@@ -143,6 +148,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
 │   ├── techstack.e2e.ts
 │   └── tsconfig.json
 ├── src/
+│   ├── manifest.json               # Manifest V3 source; the build adds the background key per browser
 │   ├── background.ts               # service worker: captures main_frame responses
 │   ├── shared/
 │   │   └── capture.ts              # per-tab capture in storage.session
@@ -182,7 +188,7 @@ tests; see [AGENTS.md](AGENTS.md) for the architecture and conventions, and
     ├── dependabot.yml              # npm and GitHub Actions updates
     └── workflows/
         ├── ci.yml                  # check, build, Firefox lint and end-to-end tests
-        ├── release.yml             # on a v* tag: store zip attached to a GitHub Release
+        ├── release.yml             # on a v* tag: Chromium and Firefox zips attached to a GitHub Release
         └── safari.yml              # on demand: unsigned iOS app with the Safari extension
 ```
 
