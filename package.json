@@ -18,13 +18,13 @@
     "icons": "node scripts/render-icons.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.1",
     "@types/chrome": "^0.3.4",
-    "@types/node": "^26.6.3",
+    "@types/node": "^26.6.5",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
-    "vitest": "^5.0.3",
-    "web-ext": "^10.7.0"
+    "vitest": "^5.0.5",
+    "web-ext": "^10.8.0"
   },
   "overrides": {
     "shell-quote": "^1.11.0"
